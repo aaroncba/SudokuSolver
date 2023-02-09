@@ -1,2 +1,3 @@
 # SudokuSolver
-Project#1 -> This code will be able to solve any sudoku. 
+##Project#1: Sudoku Solver  
+This code will be able to solve any sudoku through backtracking.  
