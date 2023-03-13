@@ -120,6 +120,41 @@ public class NewSudokuSolver {
     * After it exits the first for loop, pasos will be set up to 0.
      * */
 
+    public void CheckSquare(){
+        int reinicio = 0, renglon = 0, pasos = 0;
+        while(reinicio < 3){
+            while(pasos < 3){
+                for(int i = 0; i < 3; i++){
+                    int PlaceHolderRenglon = renglon, PlaceHolderReinicio = 0;
+                    if(!this.StateOfGrid[renglon][i+(3*reinicio)]){
+                        if(renglon < 3){
+                            PlaceHolderRenglon = 0;
+                        }
+                        else if(renglon < 6){
+                            PlaceHolderRenglon = 3;
+                        }else{
+                            PlaceHolderRenglon = 6;
+                        }
+                        while(PlaceHolderRenglon < 3){
+                            for(int a = 0; a < 3; a++){
+                                this.PosibleValues[renglon][i+(3*PlaceHolderReinicio)].remove((Integer)this.GridToUse[PlaceHolderRenglon][a+(3*reinicio)]);
+                            }
+                            PlaceHolderReinicio++;
+                            PlaceHolderRenglon++;
+                        }
+                    }
+                }
+                renglon++;
+                pasos++;
+                if(renglon == 9){
+                    renglon = 0;
+                    reinicio++;
+                }
+            }
+            pasos = 0;
+        }
+
+    }
 
 
     //CheckandAddValues
