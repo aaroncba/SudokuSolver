@@ -7,29 +7,47 @@ public class NewSudokuSolver {
     *   -Create a new code and document each function
     * */
     //this String is a placeholder to try to resolve this sudoku.
-    String GridToUse = "000000048470019000008000000040008000600000050900002600017050000000000560000020093";
+    //String GridToUse = "000000048470019000008000000040008000600000050900002600017050000000000560000020093";
+    String GridToUse = "100486050300079084486000907019700205542001008000295460060000523003852140251630000+";
     int[][] SudokuGrid = new int[9][9];
-     ArrayList[][] PosibleValues = new ArrayList[9][9];
+     ArrayList<Integer>[][] PosibleValues = new ArrayList[9][9];
      boolean[][] StateOfGrid = new boolean[9][9];
+     boolean Solvable = true;
     public static void main(String[] args) {
         NewSudokuSolver sudoku = new NewSudokuSolver();
         sudoku.InsertValues();
-        sudoku.printGrid(sudoku.SudokuGrid);
-        System.out.println();
-        sudoku.CheckLine();
-        sudoku.printGrid(sudoku.SudokuGrid);
+        int count = 0;
+        while(count != 10){ 
+
+            System.out.println();
+            sudoku.printGrid(sudoku.SudokuGrid);
+            sudoku.CheckLine();
+            sudoku.printGrid();
+            sudoku.CheckSquare();
+            System.out.println();
+            sudoku.printGrid();
+            System.out.println();
+            //sudoku.printGrid(sudoku.SudokuGrid);
+            boolean added = sudoku.CheckandAddValues();
+            if(added){
+                count = 0;
+            }else{
+                count++;
+            }
+
+        }
     }
     //InsertValues
     public void InsertValues(){
         int count = 0;
         for(int i = 0; i < 9; i++){
             for(int j = 0; j < 9; j++) {
-                this.PosibleValues[i][j] = new ArrayList<Integer>();
-                for(int add = 1; add <= 9; add++){
-                    this.PosibleValues[i][j].add(add);
-                }
+                this.PosibleValues[i][j] = new ArrayList<>();
 
                 int value = Character.getNumericValue(GridToUse.charAt(count)) ;
+                for(int add = 1; add <= 9; add++) {
+                    this.PosibleValues[i][j].add(add);
+                }
                 count++;
                 this.SudokuGrid[i][j] = value;
                 if(value != 0){
@@ -61,6 +79,19 @@ public class NewSudokuSolver {
             }
         }
     }
+
+
+    public void printGrid(){
+        for(int i = 0; i < 9; i++){
+            for(int j = 0; j < 9; j++){
+                if(this.StateOfGrid[i][j]) {
+                    System.out.print("[-] , "+ " || ");
+                }else{
+                System.out.print(this.PosibleValues[i][j] + " , " + this.StateOfGrid[i][j] + " || ");}
+            }
+            System.out.println();
+        }
+    }
     //CheckLine
     /*
      * This code will check each horizontal and vertical line, to check the values that can be at an specific square
@@ -80,13 +111,13 @@ public class NewSudokuSolver {
                     //System.out.printf("Boolean value %B, posicion x %d, posicion y %d, Static line %d %n", this.StateOfGrid[staticLine][y], x, y, staticLine);
                     if(this.StateOfGrid[staticLine][y]){
                         this.PosibleValues[x][y].remove((Integer)this.SudokuGrid[staticLine][y]);
-                        System.out.println("Value y " + y + "Value staticLine " + staticLine + " Value to remove " + this.SudokuGrid[staticLine][y]);
-                        System.out.println("List is the following" + this.PosibleValues[x][y].toString());
+                        //System.out.println("Value y " + y + "Value staticLine " + staticLine + " Value to remove " + this.SudokuGrid[staticLine][y]);
+                        //System.out.println("List is the following" + this.PosibleValues[x][y].toString());
                     }
                     if(this.StateOfGrid[x][staticLine]){
                         this.PosibleValues[x][y].remove((Integer)this.SudokuGrid[x][staticLine]);
-                        System.out.println("Value x " + x + "Value staticLine " + staticLine + " Value to remove " + this.SudokuGrid[staticLine][y]);
-                        System.out.println("List is the following" + this.PosibleValues[x][y].toString());
+                        //System.out.println("Value x " + x + "Value staticLine " + staticLine + " Value to remove " + this.SudokuGrid[staticLine][y]);
+                        //System.out.println("List is the following" + this.PosibleValues[x][y].toString());
                     }
                 }
 
@@ -137,7 +168,7 @@ public class NewSudokuSolver {
                         }
                         while(PlaceHolderRenglon < 3){
                             for(int a = 0; a < 3; a++){
-                                this.PosibleValues[renglon][i+(3*PlaceHolderReinicio)].remove((Integer)this.GridToUse[PlaceHolderRenglon][a+(3*reinicio)]);
+                                 if(this.StateOfGrid[renglon][i+(3*PlaceHolderReinicio)]) this.PosibleValues[renglon][i+(3*PlaceHolderReinicio)].remove((Integer)this.SudokuGrid[PlaceHolderRenglon][a+(3*reinicio)]);
                             }
                             PlaceHolderReinicio++;
                             PlaceHolderRenglon++;
@@ -158,6 +189,33 @@ public class NewSudokuSolver {
 
 
     //CheckandAddValues
-    //AbleToSolve
+    /*
+    * CheckandAddValues()
+    *
+    * This function will take no parameters, will return a boolean.
+    * boolean ValueChanged = false;
+    * This function will iterate through all the list and find values in PosibleValues that have only 1 value and are false (empty)
+    *   if the previous is found, then the value will be changed, and ValueChanged will be setup to true.
+    *   if the value of PosibleValues is 0 and the value os the Grid is false, then it means the sudoku unsolvable, so it will change the global variable Solvable to false.
+    *   else continue.
+    * Return ValueChanged -> this value will be true if a value was added, false if no changed were made.
+    * */
+
+    public boolean CheckandAddValues(){
+        boolean ValueChanged = false;
+        for(int i = 0; i < 9; i++){
+            for(int j = 0; j < 9; j++){
+                if(!this.StateOfGrid[i][j]){
+                    if(this.PosibleValues[i][j].size()==1){
+                        this.SudokuGrid[i][j] = this.PosibleValues[i][j].get(0);
+                        this.StateOfGrid[i][j] = true;
+                        ValueChanged = true;
+                    }
+                }
+            }
+        }
+        return ValueChanged;
+    }
+
     //BacktrackingAlgoritm
 }
